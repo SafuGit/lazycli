@@ -56,6 +56,35 @@ EOF
 echo "LazyCLI Version: $VERSION"
 echo "Working..."
 
+# *HELPER FUNCTIONS TO CREATE DOCKERFILES.
+create_node_dockerfile() {
+  echo "npm start command: (npm start)"
+  read -r npm_start_command
+  if [[ -z "$npm_start_command" ]]; then
+    echo "Defaulting to: npm start"
+    npm_start_command="start"
+  fi
+  cat << EOF > Dockerfile
+# Node.js Dockerfile (AUTO-CREATED)
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "${npm_start_command}"]
+EOF
+  if [[ -f Dockerfile ]]; then
+    echo "Dockerfile created successfully."
+  else
+    echo "Failed to create Dockerfile."
+  fi
+}
+
 docker_init() {
   echo "Initializing Docker configuration..."
 
@@ -78,7 +107,21 @@ EOF
       ;;
   esac
 
-  echo "Creating Dockerfile for choice $choice..."
+  if [[ -f Dockerfile ]]; then
+    read -p "Dockerfile already exists. Overwrite? (y/n): " confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+      echo "Aborted."
+      return 1
+    fi
+  fi
+
+  case "$choice" in
+    1) create_node_dockerfile ;;
+    2) create_react_vite_dockerfile ;;
+    3) create_springboot_dockerfile ;;
+    4) create_python_dockerfile ;;
+    5) create_python_flask_dockerfile ;;
+  esac
 }
 
 # *Main CLI Router
