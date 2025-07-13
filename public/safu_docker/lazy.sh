@@ -58,6 +58,27 @@ echo "Working..."
 
 docker_init() {
   echo "Initializing Docker configuration..."
+
+  cat << EOF
+Select a Dockerfile template to create:
+  [1] Node.js Dockerfile
+  [2] React.js-Vite Dockerfile
+  [3] SpringBoot Dockerfile
+  [4] Python Dockerfile
+  [5] Python Flask Dockerfile
+EOF
+
+  read -p "Enter your choice (1-5): " choice
+  case "$choice" in 
+    1|2|3|4|5)
+      ;;
+    *)
+      echo "Invalid choice. Exiting..."
+      exit 1
+      ;;
+  esac
+
+  echo "Creating Dockerfile for choice $choice..."
 }
 
 # *Main CLI Router
