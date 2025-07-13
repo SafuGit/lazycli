@@ -155,6 +155,38 @@ EOF
   esac
 }
 
+docker_build() {
+  echo "Building Docker image..."
+
+  if [[ ! -f Dockerfile ]]; then
+    echo "Dockerfile not found. Please create one first."
+    echo "Run 'lazy docker init' to create a Dockerfile."
+    return 1
+  fi
+
+  read -p "Enter image name (REQUIRED): " image_name
+  if [[ -z "$image_name" ]]; then
+    echo "Image name is required."
+    return 1
+  fi
+
+  read -p "Enter image tag (default: latest): " image_tag
+  if [[ -z "$image_tag" ]]; then
+    image_tag="latest"
+  fi
+
+  echo "Building image: $image_name:$image_tag..."
+
+  docker build -t "$image_name:$image_tag" .
+
+  if [[ $? -eq 0 ]]; then
+    echo "✅ Docker image '$image_name:$image_tag' built successfully."
+  else
+    echo "❌ Docker build failed."
+    exit 1
+  fi
+}
+
 # *Main CLI Router
 case "$1" in
   --help | help )
@@ -167,6 +199,9 @@ case "$1" in
     case "$2" in
       init)
         docker_init
+        ;;
+      build)
+        docker_build
         ;;
       *)
         echo "❌ Unknown docker subcommand: $2"
