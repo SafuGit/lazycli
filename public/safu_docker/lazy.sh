@@ -54,4 +54,35 @@ EOF
 }
 
 echo "LazyCLI Version: $VERSION"
-echo "Working...
+echo "Working..."
+
+docker_init() {
+  echo "Initializing Docker configuration..."
+}
+
+# *Main CLI Router
+case "$1" in
+  --help | help )
+    show_help
+    ;;
+  --version | -v )
+    echo "LazyCLI v$VERSION"
+    ;;
+  docker )
+    case "$2" in
+      init)
+        docker_init
+        ;;
+      *)
+        echo "❌ Unknown docker subcommand: $2"
+        show_help
+        exit 1
+        ;;
+    esac
+    ;;
+  *)
+    echo "❌ Unknown command: $1"
+    show_help
+    exit 1
+    ;;
+esac
