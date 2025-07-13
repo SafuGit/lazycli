@@ -58,8 +58,7 @@ echo "Working..."
 
 # *HELPER FUNCTIONS TO CREATE DOCKERFILES.
 create_node_dockerfile() {
-  echo "npm start command: (npm start)"
-  read -r npm_start_command
+  read -p "npm start command (default: npm start): " npm_start_command
   if [[ -z "$npm_start_command" ]]; then
     echo "Defaulting to: npm start"
     npm_start_command="start"
@@ -83,6 +82,38 @@ EOF
   else
     echo "Failed to create Dockerfile."
   fi
+}
+
+create_react_vite_dockerfile() {
+  read -p "app port (default: 5173): " app_port
+  if [[ -z "$app_port" ]]; then
+    echo "Defaulting to: 5173"
+    app_port=5173
+  fi
+  cat << EOF > Dockerfile
+# React.js Vite Dockerfile (AUTO-CREATED)
+FROM node:20-alpine AS BUILDER
+
+# STEP 1: BUILD
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+# STEP 2: SERVE WITH ALPINE
+FROM nginx:alpine
+
+# Copy the built app to Nginx's default public folder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Expose the port
+EXPOSE $app_port
+
+# Start Nginx when container runs
+CMD ["nginx", "-g", "daemon off;"]
+EOF
 }
 
 docker_init() {
