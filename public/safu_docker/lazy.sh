@@ -52,3 +52,6 @@ For more details on each command, run:
 
 EOF
 }
+
+echo "LazyCLI Version: $VERSION"
+echo "Working...
