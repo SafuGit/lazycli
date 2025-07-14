@@ -155,6 +155,27 @@ EOF
   esac
 }
 
+create_python_dockerfile() {
+  read -p "default python file (default: python main.py): " python_file
+  if [[ -z "$python_file" ]]; then
+    echo "Defaulting to: python main.py"
+    python_file="main.py"
+  fi
+  cat << EOF > Dockerfile
+# Python Dockerfile (AUTO-CREATED)
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["python", "${python_file}"]
+EOF
+}
+
 docker_build() {
   echo "Building Docker image..."
 
